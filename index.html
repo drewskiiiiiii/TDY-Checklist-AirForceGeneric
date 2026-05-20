@@ -380,8 +380,13 @@
     border-radius: var(--radius-sm);
     background: var(--surface2);
     color: var(--text);
-    font-family: inherit; width: 100%; outline: none;
+    font-family: inherit; 
+    width: 100%; 
+    outline: none;
     transition: border-color 0.15s, background-color 0.2s, color 0.2s;
+    resize: none; /* Prevents manual drag resizing */
+    overflow: hidden; /* Hides internal scrollbar for auto-grow */
+    line-height: 1.4;
   }
   .item-notes:focus { border-color: var(--accent); }
   .item-notes::placeholder { color: var(--muted); }
@@ -965,7 +970,8 @@ function build() {
         row.className = 'check-item' + (state[key] ? ' done' : '');
  
         const noteVal = notes[key] || '';
-        const noteHtml = `<input type="text" class="item-notes" placeholder="Notes…" value="${noteVal.replace(/"/g,'&quot;')}">`;
+        // Change from input to textarea for multi-line support
+        const noteHtml = `<textarea class="item-notes" placeholder="Notes…" rows="1">${noteVal.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</textarea>`;
  
         row.innerHTML = `
           <div class="checkbox">
@@ -1002,9 +1008,23 @@ function build() {
           if (e.target.classList.contains('item-notes') || e.target.classList.contains('editable-text') || e.target.classList.contains('delete-btn')) return;
           toggleItem(key, row);
         });
-        row.querySelector('.item-notes').addEventListener('input', e => {
-          notes[key] = e.target.value; saveState();
+        
+        const notesInput = row.querySelector('.item-notes');
+        notesInput.addEventListener('input', e => {
+          notes[key] = e.target.value; 
+          saveState();
+          // Auto-resize logic
+          e.target.style.height = 'auto';
+          e.target.style.height = e.target.scrollHeight + 'px';
         });
+        
+        // Ensure previously saved notes resize properly on page load
+        if (noteVal) {
+          setTimeout(() => {
+            notesInput.style.height = 'auto';
+            notesInput.style.height = notesInput.scrollHeight + 'px';
+          }, 0);
+        }
  
         cl.appendChild(row);
       });
