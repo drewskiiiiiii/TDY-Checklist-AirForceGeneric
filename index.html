@@ -8,8 +8,10 @@
 <meta name="apple-mobile-web-app-title" content="TDY Checklist">
 <link rel="manifest" href="manifest2.json">
 
-<link rel="apple-touch-icon" href="icon.png?v=2">
-<link rel="icon" type="image/png" href="icon.png?v=2">
+<link rel="apple-touch-icon" sizes="180x180" href="./icon.png?v=3">
+<link rel="icon" type="image/png" sizes="192x192" href="./icon.png?v=3">
+<link rel="icon" type="image/png" sizes="512x512" href="./icon.png?v=3">
+<link rel="shortcut icon" href="./icon.png?v=3">
 
 <meta name="theme-color" content="#000000">
 <meta name="mobile-web-app-capable" content="yes">
@@ -101,6 +103,32 @@
   .theme-picker {
     display: flex; gap: 6px; align-items: center;
   }
+  
+  .color-picker-input {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    padding: 0;
+    transition: transform 0.15s;
+  }
+  .color-picker-input::-webkit-color-swatch-wrapper {
+    padding: 0;
+  }
+  .color-picker-input::-webkit-color-swatch {
+    border: 1.5px solid var(--border-hi);
+    border-radius: 50%;
+  }
+  .color-picker-input::-moz-color-swatch {
+    border: 1.5px solid var(--border-hi);
+    border-radius: 50%;
+  }
+  .color-picker-input:active { transform: scale(0.9); }
+
   .theme-dot {
     width: 14px; height: 14px; border-radius: 50%;
     cursor: pointer; border: 1.5px solid transparent;
@@ -108,8 +136,8 @@
   }
   .theme-dot.active { border-color: var(--text); transform: scale(1.15); }
   
-  .theme-sep { width: 1px; height: 14px; background: var(--border-hi); margin: 0 2px; }
-  .bg-dot { border: 1.5px solid var(--border-hi); }
+  .theme-sep { width: 1px; height: 16px; background: var(--border-hi); margin: 0 4px; }
+  .bg-dot { border: 1.5px solid var(--border-hi); width: 18px; height: 18px; }
   
   .reset-btn {
     background: none;
@@ -403,11 +431,7 @@
       <div class="header-sub-row">
         <div class="cao-box">CAO: <span id="cao-date"></span></div>
         <div class="theme-picker" id="theme-picker">
-          <div class="theme-dot" style="background: #1eb4f0" data-theme="cyan" onclick="setTheme('cyan')"></div>
-          <div class="theme-dot" style="background: #20c997" data-theme="green" onclick="setTheme('green')"></div>
-          <div class="theme-dot" style="background: #b060e0" data-theme="purple" onclick="setTheme('purple')"></div>
-          <div class="theme-dot" style="background: #fd7e14" data-theme="orange" onclick="setTheme('orange')"></div>
-          <div class="theme-dot" style="background: #fa5252" data-theme="red" onclick="setTheme('red')"></div>
+          <input type="color" id="custom-color-picker" class="color-picker-input" value="#1eb4f0" title="Choose Accent Color">
           
           <div class="theme-sep"></div>
           
@@ -566,27 +590,36 @@ const DEFAULT_SECTIONS = [
   },
 ];
 
-// ── THEMES & BACKGROUND ──────────────────────────────────────────────────────
-const THEMES = {
-  cyan:   { val: '#1eb4f0', dim: 'rgba(30,180,240,0.18)', border: 'rgba(30,180,240,0.45)', glow: 'rgba(30,180,240,0.6)' },
-  green:  { val: '#20c997', dim: 'rgba(32,201,151,0.18)', border: 'rgba(32,201,151,0.45)', glow: 'rgba(32,201,151,0.6)' },
-  purple: { val: '#b060e0', dim: 'rgba(176,96,224,0.18)', border: 'rgba(176,96,224,0.45)', glow: 'rgba(176,96,224,0.6)' },
-  orange: { val: '#fd7e14', dim: 'rgba(253,126,20,0.18)', border: 'rgba(253,126,20,0.45)', glow: 'rgba(253,126,20,0.6)' },
-  red:    { val: '#fa5252', dim: 'rgba(250,82,82,0.18)', border: 'rgba(250,82,82,0.45)', glow: 'rgba(250,82,82,0.6)' }
-};
-
-function setTheme(id) {
-  const t = THEMES[id] || THEMES.cyan;
-  document.documentElement.style.setProperty('--accent', t.val);
-  document.documentElement.style.setProperty('--accent-dim', t.dim);
-  document.documentElement.style.setProperty('--accent-border', t.border);
-  document.documentElement.style.setProperty('--accent-glow', t.glow);
-  localStorage.setItem('tdy2_theme', id);
-  
-  document.querySelectorAll('.theme-dot[data-theme]').forEach(el => el.classList.remove('active'));
-  const activeDot = document.querySelector(`.theme-dot[data-theme="${id}"]`);
-  if(activeDot) activeDot.classList.add('active');
+// ── COLOR CONVERTER & THEME APPLY ────────────────────────────────────────────
+function hexToRgb(hex) {
+  // Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
+  var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+  hex = hex.replace(shorthandRegex, function(m, r, g, b) { return r + r + g + g + b + b; });
+  var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return result ? { r: parseInt(result[1], 16), g: parseInt(result[2], 16), b: parseInt(result[3], 16) } : null;
 }
+
+function applyCustomColor(hex) {
+  const rgb = hexToRgb(hex);
+  if (!rgb) return;
+  const { r, g, b } = rgb;
+  
+  document.documentElement.style.setProperty('--accent', hex);
+  document.documentElement.style.setProperty('--accent-dim', `rgba(${r}, ${g}, ${b}, 0.18)`);
+  document.documentElement.style.setProperty('--accent-border', `rgba(${r}, ${g}, ${b}, 0.45)`);
+  document.documentElement.style.setProperty('--accent-glow', `rgba(${r}, ${g}, ${b}, 0.6)`);
+  
+  localStorage.setItem('tdy2_theme_color', hex);
+  
+  // Sync the picker value
+  const picker = document.getElementById('custom-color-picker');
+  if (picker && picker.value !== hex) picker.value = hex;
+}
+
+// Attach listener to the color picker
+document.getElementById('custom-color-picker').addEventListener('input', (e) => {
+  applyCustomColor(e.target.value);
+});
 
 function setBgMode(mode) {
   if (mode === 'light') {
@@ -616,8 +649,8 @@ function loadState() {
   const savedTitle = localStorage.getItem('tdy2_title');
   if (savedTitle) document.getElementById('main-title').textContent = savedTitle;
 
-  const savedTheme = localStorage.getItem('tdy2_theme') || 'cyan';
-  setTheme(savedTheme);
+  const savedColor = localStorage.getItem('tdy2_theme_color') || '#1eb4f0';
+  applyCustomColor(savedColor);
   
   const savedBg = localStorage.getItem('tdy2_bg') || 'dark';
   setBgMode(savedBg);
