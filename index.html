@@ -12,11 +12,10 @@
 <title>TDY Mission Checklist</title>
 <style>
   :root {
-    --cyan:        #1eb4f0;
-    --cyan-dim:    rgba(30, 180, 240, 0.18);
-    --cyan-border: rgba(30, 180, 240, 0.45);
-    --purple:      #b060e0;
-    --purple-dim:  rgba(176, 96, 224, 0.18);
+    --accent:        #1eb4f0;
+    --accent-dim:    rgba(30, 180, 240, 0.18);
+    --accent-border: rgba(30, 180, 240, 0.45);
+    --accent-glow:   rgba(30, 180, 240, 0.6);
  
     --bg:          #000000;
     --surface:     #101010;
@@ -44,7 +43,7 @@
   /* ── HEADER ─────────────────────────────────────── */
   .header {
     background: var(--surface);
-    border-bottom: 1.5px solid var(--cyan-border);
+    border-bottom: 1.5px solid var(--accent-border);
     padding: 14px 16px 12px;
     position: sticky;
     top: 0;
@@ -55,13 +54,17 @@
     margin-bottom: 10px;
   }
   .header-title-wrap {
-    display: flex; flex-direction: column; gap: 4px;
+    display: flex; flex-direction: column; gap: 6px;
   }
   .header h1 {
     font-size: 21px; font-weight: 800;
     letter-spacing: 0.3px;
-    color: var(--cyan);
-    line-height: 1;
+    color: var(--accent);
+    line-height: 1.1;
+    width: fit-content;
+  }
+  .header-sub-row {
+    display: flex; align-items: center; gap: 12px;
   }
   .cao-box {
     display: inline-block;
@@ -73,6 +76,18 @@
     padding: 2px 6px; border-radius: 4px;
     width: fit-content;
   }
+  
+  /* ── THEME PICKER ────────────────────────────────── */
+  .theme-picker {
+    display: flex; gap: 6px;
+  }
+  .theme-dot {
+    width: 14px; height: 14px; border-radius: 50%;
+    cursor: pointer; border: 1.5px solid transparent;
+    transition: transform 0.15s, border-color 0.15s;
+  }
+  .theme-dot.active { border-color: #fff; transform: scale(1.15); }
+  
   .reset-btn {
     background: none;
     border: 1px solid var(--border-hi);
@@ -82,6 +97,7 @@
     border-radius: 20px;
     cursor: pointer; font-family: inherit;
     text-transform: uppercase; letter-spacing: 0.4px;
+    flex-shrink: 0;
   }
   .reset-btn:active { opacity: 0.5; }
  
@@ -104,7 +120,7 @@
     outline: none;
     transition: border-color 0.15s;
   }
-  .search-input:focus { border-color: var(--cyan); }
+  .search-input:focus { border-color: var(--accent); }
   .search-input::placeholder { color: var(--muted); }
   .search-clear {
     position: absolute; right: 9px; top: 50%;
@@ -126,9 +142,9 @@
   }
   .progress-track { background: var(--border); border-radius: 4px; height: 5px; overflow: hidden; }
   .progress-fill {
-    height: 100%; background: var(--cyan); border-radius: 4px;
-    transition: width 0.4s cubic-bezier(.4,0,.2,1);
-    box-shadow: 0 0 8px rgba(30,180,240,0.5);
+    height: 100%; background: var(--accent); border-radius: 4px;
+    transition: width 0.4s cubic-bezier(.4,0,.2,1), background-color 0.3s;
+    box-shadow: 0 0 8px var(--accent-glow);
   }
  
   /* ── SEARCH LABEL / NO RESULTS ───────────────────── */
@@ -171,11 +187,11 @@
     background: var(--border-hi); transition: background 0.2s; flex-shrink: 0;
   }
   .tab.active {
-    border-color: var(--cyan);
-    background: var(--cyan-dim);
-    color: var(--cyan);
+    border-color: var(--accent);
+    background: var(--accent-dim);
+    color: var(--accent);
   }
-  .tab.active .tab-dot { background: var(--cyan); }
+  .tab.active .tab-dot { background: var(--accent); }
   .tab:active { transform: scale(0.96); }
  
   /* ── SECTION ─────────────────────────────────────── */
@@ -187,7 +203,7 @@
     display: none;
     font-size: 11px; font-weight: 800;
     letter-spacing: 1px; text-transform: uppercase;
-    color: var(--cyan); border: 1px solid var(--cyan-border);
+    color: var(--accent); border: 1px solid var(--accent-border);
     padding: 2px 10px; border-radius: 4px;
     margin-bottom: 6px; width: fit-content;
   }
@@ -204,6 +220,21 @@
   .group-header::after { content: ''; flex: 1; height: 1px; background: var(--border); }
   .group-header.search-hidden { display: none !important; }
  
+  /* ── EDITABLE TEXT ───────────────────────────────── */
+  .editable-text {
+    outline: none;
+    border-bottom: 1px dashed transparent;
+    transition: border-bottom-color 0.2s, color 0.2s;
+    cursor: text;
+    padding-bottom: 1px;
+  }
+  .editable-text:hover, .editable-text:focus {
+    border-bottom-color: var(--accent);
+  }
+  .tab.active .editable-text:hover, .tab.active .editable-text:focus {
+    color: var(--accent);
+  }
+ 
   /* ── CHECKLIST ───────────────────────────────────── */
   .checklist { display: flex; flex-direction: column; gap: 3px; }
   .check-item.search-hidden { display: none !important; }
@@ -212,7 +243,7 @@
     display: flex; align-items: center; gap: 13px;
     background: var(--surface);
     border: 1px solid var(--border);
-    border-left: 3px solid var(--cyan-border);
+    border-left: 3px solid var(--accent-border);
     border-radius: var(--radius-sm);
     padding: 13px 14px;
     cursor: pointer;
@@ -240,9 +271,9 @@
     background: var(--surface2);
   }
   .check-item.done .checkbox {
-    background: var(--cyan);
-    border-color: var(--cyan);
-    box-shadow: 0 0 8px rgba(30,180,240,0.6);
+    background: var(--accent);
+    border-color: var(--accent);
+    box-shadow: 0 0 8px var(--accent-glow);
   }
   .checkmark { display: none; width: 11px; height: 8px; }
   .checkmark path { stroke: #000; stroke-width: 2.5; fill: none; stroke-linecap: round; stroke-linejoin: round; }
@@ -263,13 +294,13 @@
     font-family: inherit; width: 100%; outline: none;
     transition: border-color 0.15s;
   }
-  .item-notes:focus { border-color: var(--cyan); }
+  .item-notes:focus { border-color: var(--accent); }
   .item-notes::placeholder { color: var(--muted); }
   .check-item.done .item-notes { opacity: 0.4; }
  
   /* ── SEARCH HIGHLIGHT ────────────────────────────── */
   .search-highlight {
-    background: var(--cyan);
+    background: var(--accent);
     color: #000;
     border-radius: 2px;
     padding: 0 1px;
@@ -279,12 +310,12 @@
   .phase-summary {
     position: fixed; bottom: 0; left: 0; right: 0;
     background: var(--surface);
-    border-top: 1.5px solid var(--cyan-border);
+    border-top: 1.5px solid var(--accent-border);
     padding: 10px 20px 26px;
     display: flex; justify-content: space-around;
   }
   .phase-stat { text-align: center; }
-  .phase-stat .ps-num { font-size: 22px; font-weight: 800; }
+  .phase-stat .ps-num { font-size: 22px; font-weight: 800; color: var(--accent); }
   .phase-stat .ps-label {
     font-size: 10px; font-weight: 700;
     color: var(--muted); text-transform: uppercase;
@@ -297,8 +328,17 @@
 <div class="header">
   <div class="header-top">
     <div class="header-title-wrap">
-      <h1>KC-135 TDY Checklist</h1>
-      <div class="cao-box">CAO: <span id="cao-date"></span></div>
+      <h1 class="editable-text" contenteditable="true" spellcheck="false" id="main-title">KC-135 TDY Checklist</h1>
+      <div class="header-sub-row">
+        <div class="cao-box">CAO: <span id="cao-date"></span></div>
+        <div class="theme-picker" id="theme-picker">
+          <div class="theme-dot" style="background: #1eb4f0" data-theme="cyan" onclick="setTheme('cyan')"></div>
+          <div class="theme-dot" style="background: #20c997" data-theme="green" onclick="setTheme('green')"></div>
+          <div class="theme-dot" style="background: #b060e0" data-theme="purple" onclick="setTheme('purple')"></div>
+          <div class="theme-dot" style="background: #fd7e14" data-theme="orange" onclick="setTheme('orange')"></div>
+          <div class="theme-dot" style="background: #fa5252" data-theme="red" onclick="setTheme('red')"></div>
+        </div>
+      </div>
     </div>
     <button class="reset-btn" onclick="resetAll()">Reset</button>
   </div>
@@ -335,7 +375,7 @@ const lastModDate = new Date(document.lastModified);
 const dateOptions = { day: '2-digit', month: 'short', year: 'numeric' };
 document.getElementById('cao-date').textContent = lastModDate.toLocaleDateString('en-US', dateOptions).toUpperCase();
 
-const SECTIONS = [
+const DEFAULT_SECTIONS = [
   {
     id: 'mission-planning', label: 'Mission Planning', color: 'plan',
     groups: [
@@ -445,17 +485,69 @@ const SECTIONS = [
     ]
   },
 ];
+
+// ── THEMES ───────────────────────────────────────────────────────────────────
+const THEMES = {
+  cyan:   { val: '#1eb4f0', dim: 'rgba(30,180,240,0.18)', border: 'rgba(30,180,240,0.45)', glow: 'rgba(30,180,240,0.6)' },
+  green:  { val: '#20c997', dim: 'rgba(32,201,151,0.18)', border: 'rgba(32,201,151,0.45)', glow: 'rgba(32,201,151,0.6)' },
+  purple: { val: '#b060e0', dim: 'rgba(176,96,224,0.18)', border: 'rgba(176,96,224,0.45)', glow: 'rgba(176,96,224,0.6)' },
+  orange: { val: '#fd7e14', dim: 'rgba(253,126,20,0.18)', border: 'rgba(253,126,20,0.45)', glow: 'rgba(253,126,20,0.6)' },
+  red:    { val: '#fa5252', dim: 'rgba(250,82,82,0.18)', border: 'rgba(250,82,82,0.45)', glow: 'rgba(250,82,82,0.6)' }
+};
+
+function setTheme(id) {
+  const t = THEMES[id] || THEMES.cyan;
+  document.documentElement.style.setProperty('--accent', t.val);
+  document.documentElement.style.setProperty('--accent-dim', t.dim);
+  document.documentElement.style.setProperty('--accent-border', t.border);
+  document.documentElement.style.setProperty('--accent-glow', t.glow);
+  localStorage.setItem('tdy2_theme', id);
+  
+  document.querySelectorAll('.theme-dot').forEach(el => el.classList.remove('active'));
+  const activeDot = document.querySelector(`.theme-dot[data-theme="${id}"]`);
+  if(activeDot) activeDot.classList.add('active');
+}
  
-let state = {}, notes = {};
+let state = {}, notes = {}, SECTIONS = [];
+let activeTabId = null;
  
 function loadState() {
   try { state = JSON.parse(localStorage.getItem('tdy2_state') || '{}'); } catch(e) { state = {}; }
   try { notes = JSON.parse(localStorage.getItem('tdy2_notes') || '{}'); } catch(e) { notes = {}; }
+  try { 
+    const savedSec = localStorage.getItem('tdy2_sections');
+    SECTIONS = savedSec ? JSON.parse(savedSec) : JSON.parse(JSON.stringify(DEFAULT_SECTIONS)); 
+  } catch(e) { SECTIONS = JSON.parse(JSON.stringify(DEFAULT_SECTIONS)); }
+  
+  const savedTitle = localStorage.getItem('tdy2_title');
+  if (savedTitle) document.getElementById('main-title').textContent = savedTitle;
+
+  const savedTheme = localStorage.getItem('tdy2_theme') || 'cyan';
+  setTheme(savedTheme);
 }
 function saveState() {
   localStorage.setItem('tdy2_state', JSON.stringify(state));
   localStorage.setItem('tdy2_notes', JSON.stringify(notes));
 }
+function saveSections() {
+  localStorage.setItem('tdy2_sections', JSON.stringify(SECTIONS));
+}
+
+// Editable Title Initialization
+const titleEl = document.getElementById('main-title');
+titleEl.addEventListener('blur', e => {
+   const newTitle = e.target.textContent.trim();
+   if (newTitle) {
+       localStorage.setItem('tdy2_title', newTitle);
+   } else {
+       e.target.textContent = 'KC-135 TDY Checklist';
+       localStorage.removeItem('tdy2_title');
+   }
+});
+titleEl.addEventListener('keydown', e => {
+   if (e.key === 'Enter') { e.preventDefault(); e.target.blur(); }
+});
+
 function itemKey(sId, gTitle, item) { return `${sId}||${gTitle}||${item}`; }
 function getAllKeys() {
   const k = [];
@@ -472,7 +564,7 @@ function updateProgress() {
  
   document.getElementById('phase-summary').innerHTML = `
     <div class="phase-stat">
-      <div class="ps-num" style="color:var(--cyan)">${done}/${all.length}</div>
+      <div class="ps-num">${done}/${all.length}</div>
       <div class="ps-label">Total Done</div>
     </div>
   `;
@@ -482,7 +574,7 @@ function updateProgress() {
     s.groups.forEach(g => g.items.forEach(i => sKeys.push(itemKey(s.id, g.title, i))));
     const sDone = sKeys.filter(k => state[k]).length;
     const dot = document.querySelector(`[data-tab="${s.id}"] .tab-dot`);
-    if (dot) dot.style.background = (sDone === sKeys.length && sKeys.length > 0) ? 'var(--cyan)' : '';
+    if (dot) dot.style.background = (sDone === sKeys.length && sKeys.length > 0) ? 'var(--accent)' : '';
   });
 }
  
@@ -493,14 +585,17 @@ function toggleItem(key, el) {
 }
  
 function resetAll() {
-  if (!confirm('Reset all items and clear notes?')) return;
-  state = {}; notes = {}; saveState();
-  document.querySelectorAll('.check-item.done').forEach(el => el.classList.remove('done'));
-  document.querySelectorAll('.item-notes').forEach(el => el.value = '');
-  updateProgress();
+  if (!confirm('Reset all checked items and clear notes?')) return;
+  state = {}; 
+  notes = {}; 
+  saveState();
+  
+  // We no longer clear custom sections, themes, or titles here
+  build();
 }
  
 function switchTab(id) {
+  activeTabId = id;
   document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === id));
   document.querySelectorAll('.section').forEach(s => s.classList.toggle('active', s.dataset.section === id));
 }
@@ -533,8 +628,7 @@ function runSearch(query) {
       if (lbl && lbl.dataset.original) lbl.innerHTML = lbl.dataset.original;
     });
     document.querySelectorAll('.group-header').forEach(el => el.classList.remove('search-hidden'));
-    const active = document.querySelector('.tab.active');
-    switchTab(active ? active.dataset.tab : SECTIONS[0].id);
+    switchTab(activeTabId || SECTIONS[0].id);
     return;
   }
  
@@ -587,17 +681,54 @@ function build() {
   loadState();
   const tabsNav = document.getElementById('tabs-nav');
   const wrap    = document.getElementById('sections-wrap');
- 
-  SECTIONS.forEach((s, si) => {
-    const tab = document.createElement('button');
-    tab.className = 'tab' + (si === 0 ? ' active' : '');
+  
+  // Clear HTML to allow clean rebuilds when titles are edited
+  tabsNav.innerHTML = '';
+  wrap.innerHTML = '';
+  
+  if (!activeTabId && SECTIONS.length > 0) activeTabId = SECTIONS[0].id;
+
+  SECTIONS.forEach((s) => {
+    const tab = document.createElement('div');
+    tab.className = 'tab' + (s.id === activeTabId ? ' active' : '');
     tab.dataset.tab = s.id;
-    tab.innerHTML = `<span class="tab-dot"></span>${s.label}`;
-    tab.addEventListener('click', () => switchTab(s.id));
+    tab.innerHTML = `<span class="tab-dot"></span>`;
+    
+    // Editable Section Name
+    const tabText = document.createElement('span');
+    tabText.className = 'editable-text';
+    tabText.contentEditable = true;
+    tabText.spellcheck = false;
+    tabText.textContent = s.label;
+    
+    // Save on losing focus
+    tabText.addEventListener('blur', (e) => {
+      const newLabel = e.target.textContent.trim();
+      if (newLabel && newLabel !== s.label) {
+        s.label = newLabel;
+        saveSections();
+        const secLbl = document.querySelector(`.section[data-section="${s.id}"] .section-search-label`);
+        if (secLbl) secLbl.textContent = newLabel;
+      } else {
+        e.target.textContent = s.label; // revert if blank
+      }
+    });
+    // Prevent linebreaks via enter
+    tabText.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') { e.preventDefault(); e.target.blur(); }
+    });
+
+    tab.appendChild(tabText);
+    
+    // Switch tab logic, handling direct clicks on the editable area cleanly
+    tab.addEventListener('click', (e) => {
+      if (e.target !== tabText) switchTab(s.id);
+    });
+    tabText.addEventListener('focus', () => switchTab(s.id));
     tabsNav.appendChild(tab);
  
     const section = document.createElement('div');
-    section.className = 'section' + (si === 0 ? ' active' : '');
+    section.className = 'section' + (s.id === activeTabId ? ' active' : '');
     section.dataset.section = s.id;
  
     const secLbl = document.createElement('div');
@@ -608,8 +739,41 @@ function build() {
     s.groups.forEach(g => {
       const gh = document.createElement('div');
       gh.className = 'group-header';
-      gh.textContent = g.title;
       gh.dataset.group = `${s.id}||${g.title}`;
+      
+      // Editable Group Title
+      const ghText = document.createElement('span');
+      ghText.className = 'editable-text';
+      ghText.contentEditable = true;
+      ghText.spellcheck = false;
+      ghText.textContent = g.title;
+      
+      ghText.addEventListener('blur', (e) => {
+        const newTitle = e.target.textContent.trim();
+        if (newTitle && newTitle !== g.title) {
+          const oldTitle = g.title;
+          
+          // Migrate saved checkbox states and notes to the new Category name
+          g.items.forEach(item => {
+            const oldKey = itemKey(s.id, oldTitle, item);
+            const newKey = itemKey(s.id, newTitle, item);
+            if (state[oldKey] !== undefined) { state[newKey] = state[oldKey]; delete state[oldKey]; }
+            if (notes[oldKey] !== undefined) { notes[newKey] = notes[oldKey]; delete notes[oldKey]; }
+          });
+          
+          g.title = newTitle;
+          saveState();
+          saveSections();
+          build(); // Rebuild the DOM immediately to secure structural integrity
+        } else {
+          e.target.textContent = g.title; 
+        }
+      });
+      ghText.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') { e.preventDefault(); e.target.blur(); }
+      });
+      
+      gh.appendChild(ghText);
       section.appendChild(gh);
  
       const cl = document.createElement('div');
@@ -654,7 +818,11 @@ function build() {
   });
  
   updateProgress();
-  initSearch();
+  // Ensure we don't re-attach global event listeners endlessly when rebuilding
+  if (!document.getElementById('search-input').dataset.initialized) {
+     initSearch();
+     document.getElementById('search-input').dataset.initialized = 'true';
+  }
 }
  
 build();
