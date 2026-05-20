@@ -51,13 +51,27 @@
     z-index: 100;
   }
   .header-top {
-    display: flex; align-items: center; justify-content: space-between;
+    display: flex; align-items: flex-start; justify-content: space-between;
     margin-bottom: 10px;
+  }
+  .header-title-wrap {
+    display: flex; flex-direction: column; gap: 4px;
   }
   .header h1 {
     font-size: 21px; font-weight: 800;
     letter-spacing: 0.3px;
     color: var(--cyan);
+    line-height: 1;
+  }
+  .cao-box {
+    display: inline-block;
+    font-size: 10px; font-weight: 800;
+    letter-spacing: 0.8px; text-transform: uppercase;
+    color: var(--muted);
+    background: var(--surface2);
+    border: 1px solid var(--border-hi);
+    padding: 2px 6px; border-radius: 4px;
+    width: fit-content;
   }
   .reset-btn {
     background: none;
@@ -282,7 +296,10 @@
  
 <div class="header">
   <div class="header-top">
-    <h1>KC-135 TDY Checklist</h1>
+    <div class="header-title-wrap">
+      <h1>KC-135 TDY Checklist</h1>
+      <div class="cao-box">CAO: <span id="cao-date"></span></div>
+    </div>
     <button class="reset-btn" onclick="resetAll()">Reset</button>
   </div>
   <div class="search-wrap">
@@ -313,6 +330,11 @@
 <div class="phase-summary" id="phase-summary"></div>
  
 <script>
+// Auto-update CAO to the last modified date of the document
+const lastModDate = new Date(document.lastModified);
+const dateOptions = { day: '2-digit', month: 'short', year: 'numeric' };
+document.getElementById('cao-date').textContent = lastModDate.toLocaleDateString('en-US', dateOptions).toUpperCase();
+
 const SECTIONS = [
   {
     id: 'mission-planning', label: 'Mission Planning', color: 'plan',
@@ -326,7 +348,7 @@ const SECTIONS = [
         'Electronic Mission Folder (EMF)', 'AVANA Time confirmed', 'ALTRAV confirmed',
       ]},
       { title: 'Considerations', items: [
-'Emergency Airfields reviewed', 'Operating / Quiet Hours checked',
+        'Emergency Airfields reviewed', 'Operating / Quiet Hours checked',
         'Gross Weight calculated', 'Aircraft Configuration confirmed', 'Aircraft Lockbox (2 Seperate for Guns + Secrets)',
         'GSA Locks for each box', 'CDT / FDP reviewed (202v3 AMCSUP Ch 3)', 'Ground Times / Crew Rest planned',
       ]},
@@ -639,4 +661,3 @@ build();
 </script>
 </body>
 </html>
- 
