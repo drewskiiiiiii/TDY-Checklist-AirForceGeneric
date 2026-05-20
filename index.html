@@ -7,6 +7,10 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="TDY Checklist">
 <link rel="manifest" href="manifest2.json">
+
+<link rel="apple-touch-icon" href="icon.png">
+<link rel="icon" type="image/png" href="icon.png">
+
 <meta name="theme-color" content="#000000">
 <meta name="mobile-web-app-capable" content="yes">
 <title>TDY Mission Checklist</title>
@@ -34,13 +38,13 @@
   /* ── LIGHT MODE VARIABLES ──────────────────────── */
   body.light-mode {
     --bg:          #ffffff;
-    --surface:     #f4f5f7;
-    --surface2:    #e5e7eb;
-    --border:      #d1d5db;
-    --border-hi:   #9ca3af;
-    --text:        #111827;
-    --muted:       #6b7280;
-    --done-text:   #9ca3af;
+    --surface:     #ffffff;
+    --surface2:    #f4f5f7;
+    --border:      #000000; /* Solid black boxes around items */
+    --border-hi:   #000000; /* Solid black borders for inputs/checkboxes */
+    --text:        #000000; /* High contrast black text */
+    --muted:       #555555;
+    --done-text:   #888888;
   }
  
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
