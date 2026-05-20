@@ -16,6 +16,7 @@
     --accent-dim:    rgba(30, 180, 240, 0.18);
     --accent-border: rgba(30, 180, 240, 0.45);
     --accent-glow:   rgba(30, 180, 240, 0.6);
+    --red:           #fa5252;
  
     --bg:          #000000;
     --surface:     #101010;
@@ -29,6 +30,18 @@
     --radius: 10px;
     --radius-sm: 6px;
   }
+  
+  /* ── LIGHT MODE VARIABLES ──────────────────────── */
+  body.light-mode {
+    --bg:          #ffffff;
+    --surface:     #f4f5f7;
+    --surface2:    #e5e7eb;
+    --border:      #d1d5db;
+    --border-hi:   #9ca3af;
+    --text:        #111827;
+    --muted:       #6b7280;
+    --done-text:   #9ca3af;
+  }
  
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   html { height: 100%; }
@@ -38,6 +51,7 @@
     font-family: -apple-system, 'SF Pro Text', system-ui, sans-serif;
     min-height: 100vh;
     padding-bottom: 90px;
+    transition: background-color 0.2s, color 0.2s;
   }
  
   /* ── HEADER ─────────────────────────────────────── */
@@ -48,6 +62,7 @@
     position: sticky;
     top: 0;
     z-index: 100;
+    transition: background-color 0.2s, border-color 0.2s;
   }
   .header-top {
     display: flex; align-items: flex-start; justify-content: space-between;
@@ -75,18 +90,22 @@
     border: 1px solid var(--border-hi);
     padding: 2px 6px; border-radius: 4px;
     width: fit-content;
+    transition: all 0.2s;
   }
   
-  /* ── THEME PICKER ────────────────────────────────── */
+  /* ── THEME & BACKGROUND PICKER ───────────────────── */
   .theme-picker {
-    display: flex; gap: 6px;
+    display: flex; gap: 6px; align-items: center;
   }
   .theme-dot {
     width: 14px; height: 14px; border-radius: 50%;
     cursor: pointer; border: 1.5px solid transparent;
     transition: transform 0.15s, border-color 0.15s;
   }
-  .theme-dot.active { border-color: #fff; transform: scale(1.15); }
+  .theme-dot.active { border-color: var(--text); transform: scale(1.15); }
+  
+  .theme-sep { width: 1px; height: 14px; background: var(--border-hi); margin: 0 2px; }
+  .bg-dot { border: 1.5px solid var(--border-hi); }
   
   .reset-btn {
     background: none;
@@ -98,9 +117,49 @@
     cursor: pointer; font-family: inherit;
     text-transform: uppercase; letter-spacing: 0.4px;
     flex-shrink: 0;
+    transition: all 0.2s;
   }
   .reset-btn:active { opacity: 0.5; }
  
+  /* ── EDIT MODE UI ────────────────────────────────── */
+  .delete-btn {
+    display: none;
+    background: none; border: none;
+    color: var(--red); font-size: 14px; font-weight: bold;
+    cursor: pointer; padding: 2px 6px;
+    border-radius: 4px;
+    margin-left: auto;
+  }
+  .delete-btn:active { opacity: 0.5; }
+  
+  .add-btn {
+    display: none;
+    background: var(--surface2); border: 1px dashed var(--border-hi);
+    color: var(--muted); font-size: 12px; font-weight: 600;
+    cursor: pointer; padding: 6px 12px;
+    border-radius: var(--radius-sm); width: 100%; margin-top: 6px;
+    text-transform: uppercase; letter-spacing: 0.5px;
+    transition: all 0.2s;
+  }
+  
+  /* When Edit Mode is Active */
+  body.edit-mode .delete-btn { display: inline-block; }
+  body.edit-mode .add-btn { display: block; }
+  
+  body.edit-mode .editable-text {
+    pointer-events: auto;
+    border-bottom: 1px dashed var(--border-hi);
+  }
+  body.edit-mode .editable-text:hover, 
+  body.edit-mode .editable-text:focus {
+    border-bottom-color: var(--accent);
+  }
+  body.edit-mode .tab.active .editable-text { border-bottom-color: var(--accent); }
+  
+  /* Disable normal clicking in edit mode to prioritize editing */
+  body.edit-mode .check-item .checkbox,
+  body.edit-mode .check-item .item-notes { pointer-events: none; opacity: 0.3; }
+
   /* ── SEARCH ──────────────────────────────────────── */
   .search-wrap { position: relative; margin-bottom: 10px; }
   .search-icon {
@@ -118,7 +177,7 @@
     color: var(--text);
     font-size: 16px; font-family: inherit;
     outline: none;
-    transition: border-color 0.15s;
+    transition: border-color 0.15s, background-color 0.2s, color 0.2s;
   }
   .search-input:focus { border-color: var(--accent); }
   .search-input::placeholder { color: var(--muted); }
@@ -140,7 +199,7 @@
     font-size: 12px; font-weight: 600;
     color: var(--muted); margin-bottom: 5px;
   }
-  .progress-track { background: var(--border); border-radius: 4px; height: 5px; overflow: hidden; }
+  .progress-track { background: var(--border); border-radius: 4px; height: 5px; overflow: hidden; transition: background-color 0.2s; }
   .progress-fill {
     height: 100%; background: var(--accent); border-radius: 4px;
     transition: width 0.4s cubic-bezier(.4,0,.2,1), background-color 0.3s;
@@ -166,6 +225,7 @@
     scrollbar-width: none;
     background: var(--surface);
     border-bottom: 1px solid var(--border);
+    transition: background-color 0.2s, border-color 0.2s;
   }
   .tabs::-webkit-scrollbar { display: none; }
   .tabs.search-active { display: none; }
@@ -192,8 +252,7 @@
     color: var(--accent);
   }
   .tab.active .tab-dot { background: var(--accent); }
-  .tab:active { transform: scale(0.96); }
- 
+  
   /* ── SECTION ─────────────────────────────────────── */
   .section { display: none; padding: 12px 16px 0; }
   .section.active { display: block; }
@@ -217,7 +276,7 @@
     padding: 14px 0 6px;
     display: flex; align-items: center; gap: 10px;
   }
-  .group-header::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  .group-header::after { content: ''; flex: 1; height: 1px; background: var(--border); transition: background-color 0.2s; }
   .group-header.search-hidden { display: none !important; }
  
   /* ── EDITABLE TEXT ───────────────────────────────── */
@@ -227,12 +286,7 @@
     transition: border-bottom-color 0.2s, color 0.2s;
     cursor: text;
     padding-bottom: 1px;
-  }
-  .editable-text:hover, .editable-text:focus {
-    border-bottom-color: var(--accent);
-  }
-  .tab.active .editable-text:hover, .tab.active .editable-text:focus {
-    color: var(--accent);
+    pointer-events: none; /* Disabled unless in edit mode */
   }
  
   /* ── CHECKLIST ───────────────────────────────────── */
@@ -260,6 +314,9 @@
     text-decoration: line-through;
     color: var(--done-text);
   }
+  
+  /* Disable strikethrough in edit mode so text is clear */
+  body.edit-mode .check-item.done .item-label { text-decoration: none; color: var(--text); }
  
   /* ── CHECKBOX ────────────────────────────────────── */
   .checkbox {
@@ -281,7 +338,7 @@
  
   /* ── ITEM TEXT ───────────────────────────────────── */
   .item-content { flex: 1; display: flex; flex-direction: column; gap: 7px; }
-  .item-label { font-size: 16px; font-weight: 500; line-height: 1.35; color: var(--text); }
+  .item-label { font-size: 16px; font-weight: 500; line-height: 1.35; color: var(--text); transition: color 0.2s; }
  
   /* ── NOTES ───────────────────────────────────────── */
   .item-notes {
@@ -292,19 +349,11 @@
     background: var(--surface2);
     color: var(--text);
     font-family: inherit; width: 100%; outline: none;
-    transition: border-color 0.15s;
+    transition: border-color 0.15s, background-color 0.2s, color 0.2s;
   }
   .item-notes:focus { border-color: var(--accent); }
   .item-notes::placeholder { color: var(--muted); }
   .check-item.done .item-notes { opacity: 0.4; }
- 
-  /* ── SEARCH HIGHLIGHT ────────────────────────────── */
-  .search-highlight {
-    background: var(--accent);
-    color: #000;
-    border-radius: 2px;
-    padding: 0 1px;
-  }
  
   /* ── BOTTOM SUMMARY ──────────────────────────────── */
   .phase-summary {
@@ -312,14 +361,32 @@
     background: var(--surface);
     border-top: 1.5px solid var(--accent-border);
     padding: 10px 20px 26px;
-    display: flex; justify-content: space-around;
+    display: flex; justify-content: space-between;
+    align-items: center;
+    transition: background-color 0.2s, border-color 0.2s;
   }
-  .phase-stat { text-align: center; }
+  .phase-stat { text-align: left; }
   .phase-stat .ps-num { font-size: 22px; font-weight: 800; color: var(--accent); }
   .phase-stat .ps-label {
     font-size: 10px; font-weight: 700;
     color: var(--muted); text-transform: uppercase;
     letter-spacing: 0.8px; margin-top: 2px;
+  }
+  
+  .edit-toggle-btn {
+    background: var(--surface2);
+    border: 1px solid var(--border-hi);
+    color: var(--text);
+    font-size: 13px; font-weight: 600;
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer; font-family: inherit;
+    transition: all 0.2s;
+  }
+  .edit-toggle-btn.active {
+    background: var(--accent-dim);
+    color: var(--accent);
+    border-color: var(--accent);
   }
 </style>
 </head>
@@ -337,6 +404,11 @@
           <div class="theme-dot" style="background: #b060e0" data-theme="purple" onclick="setTheme('purple')"></div>
           <div class="theme-dot" style="background: #fd7e14" data-theme="orange" onclick="setTheme('orange')"></div>
           <div class="theme-dot" style="background: #fa5252" data-theme="red" onclick="setTheme('red')"></div>
+          
+          <div class="theme-sep"></div>
+          
+          <div class="theme-dot bg-dot" style="background: #000000;" data-bg="dark" onclick="setBgMode('dark')"></div>
+          <div class="theme-dot bg-dot" style="background: #ffffff;" data-bg="light" onclick="setBgMode('light')"></div>
         </div>
       </div>
     </div>
@@ -367,7 +439,11 @@
 <div class="no-results" id="no-results">No items match your search.</div>
  
 <div id="sections-wrap"></div>
-<div class="phase-summary" id="phase-summary"></div>
+
+<div class="phase-summary">
+  <div class="phase-stat" id="phase-summary-stats"></div>
+  <button class="edit-toggle-btn" id="edit-mode-btn" onclick="toggleEditMode()">Edit Checklist</button>
+</div>
  
 <script>
 // Auto-update CAO to the last modified date of the document
@@ -377,7 +453,7 @@ document.getElementById('cao-date').textContent = lastModDate.toLocaleDateString
 
 const DEFAULT_SECTIONS = [
   {
-    id: 'mission-planning', label: 'Mission Planning', color: 'plan',
+    id: 'mission-planning', label: 'Mission Planning',
     groups: [
       { title: 'Mission Docs', items: [
         'G2 Mission Setup Sheet (Remarks)', '1801, Form 200', 'WX, NOTAMs, TOLD',
@@ -414,7 +490,7 @@ const DEFAULT_SECTIONS = [
     ]
   },
   {
-    id: 'pre-departure', label: 'Pre-Departure', color: 'ops',
+    id: 'pre-departure', label: 'Pre-Departure',
     groups: [
       { title: 'Crew Actions', items: [
         'TDY Group Text established', 'Crew Brief Time established',
@@ -427,7 +503,7 @@ const DEFAULT_SECTIONS = [
     ]
   },
   {
-    id: 'day-of-flight', label: 'Day of Flight', color: 'crit',
+    id: 'day-of-flight', label: 'Day of Flight',
     groups: [
       { title: 'Pre-Flight Checks', items: [
         'Review / Initial Flight Authorizations', 'Make copies of FAs',
@@ -450,7 +526,7 @@ const DEFAULT_SECTIONS = [
     ]
   },
   {
-    id: 'destination', label: 'Destination', color: 'ops',
+    id: 'destination', label: 'Destination',
     groups: [
       { title: 'On Arrival', items: [
         'Contact TACC / C2 → LFA', 'Landing Fuel confirmed',
@@ -464,7 +540,7 @@ const DEFAULT_SECTIONS = [
     ]
   },
   {
-    id: 'next-leg', label: 'Next Leg', color: 'plan',
+    id: 'next-leg', label: 'Next Leg',
     groups: [
       { title: 'Rerun TDY Checklist', items: [
         'Rerun TDY Checklist (if req)', 'Hotel Receipt (Taxes?) obtained',
@@ -474,7 +550,7 @@ const DEFAULT_SECTIONS = [
     ]
   },
   {
-    id: 'rtb', label: 'RTB', color: 'plan',
+    id: 'rtb', label: 'RTB',
     groups: [
       { title: 'Return Actions', items: [
         'Download Cargo / Pax', 'MX Debrief completed',
@@ -486,7 +562,7 @@ const DEFAULT_SECTIONS = [
   },
 ];
 
-// ── THEMES ───────────────────────────────────────────────────────────────────
+// ── THEMES & BACKGROUND ──────────────────────────────────────────────────────
 const THEMES = {
   cyan:   { val: '#1eb4f0', dim: 'rgba(30,180,240,0.18)', border: 'rgba(30,180,240,0.45)', glow: 'rgba(30,180,240,0.6)' },
   green:  { val: '#20c997', dim: 'rgba(32,201,151,0.18)', border: 'rgba(32,201,151,0.45)', glow: 'rgba(32,201,151,0.6)' },
@@ -503,13 +579,27 @@ function setTheme(id) {
   document.documentElement.style.setProperty('--accent-glow', t.glow);
   localStorage.setItem('tdy2_theme', id);
   
-  document.querySelectorAll('.theme-dot').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.theme-dot[data-theme]').forEach(el => el.classList.remove('active'));
   const activeDot = document.querySelector(`.theme-dot[data-theme="${id}"]`);
+  if(activeDot) activeDot.classList.add('active');
+}
+
+function setBgMode(mode) {
+  if (mode === 'light') {
+    document.body.classList.add('light-mode');
+  } else {
+    document.body.classList.remove('light-mode');
+  }
+  localStorage.setItem('tdy2_bg', mode);
+  
+  document.querySelectorAll('.bg-dot').forEach(el => el.classList.remove('active'));
+  const activeDot = document.querySelector(`.bg-dot[data-bg="${mode}"]`);
   if(activeDot) activeDot.classList.add('active');
 }
  
 let state = {}, notes = {}, SECTIONS = [];
 let activeTabId = null;
+let isEditMode = false;
  
 function loadState() {
   try { state = JSON.parse(localStorage.getItem('tdy2_state') || '{}'); } catch(e) { state = {}; }
@@ -524,6 +614,9 @@ function loadState() {
 
   const savedTheme = localStorage.getItem('tdy2_theme') || 'cyan';
   setTheme(savedTheme);
+  
+  const savedBg = localStorage.getItem('tdy2_bg') || 'dark';
+  setBgMode(savedBg);
 }
 function saveState() {
   localStorage.setItem('tdy2_state', JSON.stringify(state));
@@ -531,6 +624,14 @@ function saveState() {
 }
 function saveSections() {
   localStorage.setItem('tdy2_sections', JSON.stringify(SECTIONS));
+}
+
+function toggleEditMode() {
+  isEditMode = !isEditMode;
+  document.body.classList.toggle('edit-mode', isEditMode);
+  const btn = document.getElementById('edit-mode-btn');
+  btn.textContent = isEditMode ? 'Done Editing' : 'Edit Checklist';
+  btn.classList.toggle('active', isEditMode);
 }
 
 // Editable Title Initialization
@@ -562,11 +663,9 @@ function updateProgress() {
   document.getElementById('prog-pct').textContent = pct + '%';
   document.getElementById('prog-fill').style.width = pct + '%';
  
-  document.getElementById('phase-summary').innerHTML = `
-    <div class="phase-stat">
+  document.getElementById('phase-summary-stats').innerHTML = `
       <div class="ps-num">${done}/${all.length}</div>
       <div class="ps-label">Total Done</div>
-    </div>
   `;
  
   SECTIONS.forEach(s => {
@@ -579,6 +678,7 @@ function updateProgress() {
 }
  
 function toggleItem(key, el) {
+  if (isEditMode) return; // Prevent checking off items while in edit mode
   state[key] = !state[key]; saveState();
   el.classList.toggle('done', state[key]);
   updateProgress();
@@ -589,8 +689,6 @@ function resetAll() {
   state = {}; 
   notes = {}; 
   saveState();
-  
-  // We no longer clear custom sections, themes, or titles here
   build();
 }
  
@@ -598,6 +696,49 @@ function switchTab(id) {
   activeTabId = id;
   document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === id));
   document.querySelectorAll('.section').forEach(s => s.classList.toggle('active', s.dataset.section === id));
+}
+
+// ── DELETE ACTIONS ─────────────────────────────────────────────────────────
+function deleteSection(sIndex) {
+  if (!confirm(`Delete entire section "${SECTIONS[sIndex].label}"?`)) return;
+  SECTIONS.splice(sIndex, 1);
+  if (SECTIONS.length > 0) activeTabId = SECTIONS[0].id;
+  saveSections(); build();
+}
+
+function deleteGroup(sIndex, gIndex) {
+  if (!confirm(`Delete category "${SECTIONS[sIndex].groups[gIndex].title}"?`)) return;
+  SECTIONS[sIndex].groups.splice(gIndex, 1);
+  saveSections(); build();
+}
+
+function deleteItem(sIndex, gIndex, iIndex) {
+  SECTIONS[sIndex].groups[gIndex].items.splice(iIndex, 1);
+  saveSections(); build();
+}
+
+// ── ADD ACTIONS ────────────────────────────────────────────────────────────
+function addSection() {
+  const name = prompt('New Section Name:');
+  if (!name) return;
+  const id = name.toLowerCase().replace(/\s+/g, '-');
+  SECTIONS.push({ id, label: name, groups: [] });
+  activeTabId = id;
+  saveSections(); build();
+}
+
+function addGroup(sIndex) {
+  const name = prompt('New Category Name:');
+  if (!name) return;
+  SECTIONS[sIndex].groups.push({ title: name, items: [] });
+  saveSections(); build();
+}
+
+function addItem(sIndex, gIndex) {
+  const name = prompt('New Item Name:');
+  if (!name) return;
+  SECTIONS[sIndex].groups[gIndex].items.push(name);
+  saveSections(); build();
 }
  
 // ── SEARCH ──────────────────────────────────────────────────────────────────
@@ -628,7 +769,7 @@ function runSearch(query) {
       if (lbl && lbl.dataset.original) lbl.innerHTML = lbl.dataset.original;
     });
     document.querySelectorAll('.group-header').forEach(el => el.classList.remove('search-hidden'));
-    switchTab(activeTabId || SECTIONS[0].id);
+    switchTab(activeTabId || (SECTIONS.length ? SECTIONS[0].id : null));
     return;
   }
  
@@ -682,13 +823,12 @@ function build() {
   const tabsNav = document.getElementById('tabs-nav');
   const wrap    = document.getElementById('sections-wrap');
   
-  // Clear HTML to allow clean rebuilds when titles are edited
   tabsNav.innerHTML = '';
   wrap.innerHTML = '';
   
   if (!activeTabId && SECTIONS.length > 0) activeTabId = SECTIONS[0].id;
 
-  SECTIONS.forEach((s) => {
+  SECTIONS.forEach((s, sIndex) => {
     const tab = document.createElement('div');
     tab.className = 'tab' + (s.id === activeTabId ? ' active' : '');
     tab.dataset.tab = s.id;
@@ -701,7 +841,6 @@ function build() {
     tabText.spellcheck = false;
     tabText.textContent = s.label;
     
-    // Save on losing focus
     tabText.addEventListener('blur', (e) => {
       const newLabel = e.target.textContent.trim();
       if (newLabel && newLabel !== s.label) {
@@ -710,19 +849,23 @@ function build() {
         const secLbl = document.querySelector(`.section[data-section="${s.id}"] .section-search-label`);
         if (secLbl) secLbl.textContent = newLabel;
       } else {
-        e.target.textContent = s.label; // revert if blank
+        e.target.textContent = s.label; 
       }
     });
-    // Prevent linebreaks via enter
     tabText.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') { e.preventDefault(); e.target.blur(); }
     });
 
+    const delSecBtn = document.createElement('button');
+    delSecBtn.className = 'delete-btn';
+    delSecBtn.innerHTML = '✖';
+    delSecBtn.onclick = (e) => { e.stopPropagation(); deleteSection(sIndex); };
+
     tab.appendChild(tabText);
+    tab.appendChild(delSecBtn);
     
-    // Switch tab logic, handling direct clicks on the editable area cleanly
     tab.addEventListener('click', (e) => {
-      if (e.target !== tabText) switchTab(s.id);
+      if (e.target !== tabText && e.target !== delSecBtn) switchTab(s.id);
     });
     tabText.addEventListener('focus', () => switchTab(s.id));
     tabsNav.appendChild(tab);
@@ -736,7 +879,7 @@ function build() {
     secLbl.textContent = s.label;
     section.appendChild(secLbl);
  
-    s.groups.forEach(g => {
+    s.groups.forEach((g, gIndex) => {
       const gh = document.createElement('div');
       gh.className = 'group-header';
       gh.dataset.group = `${s.id}||${g.title}`;
@@ -753,7 +896,6 @@ function build() {
         if (newTitle && newTitle !== g.title) {
           const oldTitle = g.title;
           
-          // Migrate saved checkbox states and notes to the new Category name
           g.items.forEach(item => {
             const oldKey = itemKey(s.id, oldTitle, item);
             const newKey = itemKey(s.id, newTitle, item);
@@ -762,25 +904,25 @@ function build() {
           });
           
           g.title = newTitle;
-          saveState();
-          saveSections();
-          build(); // Rebuild the DOM immediately to secure structural integrity
-        } else {
-          e.target.textContent = g.title; 
-        }
+          saveState(); saveSections(); build(); 
+        } else { e.target.textContent = g.title; }
       });
-      ghText.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') { e.preventDefault(); e.target.blur(); }
-      });
+      ghText.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); e.target.blur(); } });
+      
+      const delGroupBtn = document.createElement('button');
+      delGroupBtn.className = 'delete-btn';
+      delGroupBtn.innerHTML = '✖';
+      delGroupBtn.onclick = () => deleteGroup(sIndex, gIndex);
       
       gh.appendChild(ghText);
+      gh.appendChild(delGroupBtn);
       section.appendChild(gh);
  
       const cl = document.createElement('div');
       cl.className = 'checklist';
       cl.dataset.groupItems = `${s.id}||${g.title}`;
  
-      g.items.forEach(item => {
+      g.items.forEach((item, iIndex) => {
         const key = itemKey(s.id, g.title, item);
         const row = document.createElement('div');
         row.className = 'check-item' + (state[key] ? ' done' : '');
@@ -795,13 +937,32 @@ function build() {
             </svg>
           </div>
           <div class="item-content">
-            <span class="item-label">${item}</span>
+            <span class="item-label editable-text" contenteditable="true" spellcheck="false">${item}</span>
             ${noteHtml}
           </div>
+          <button class="delete-btn" onclick="deleteItem(${sIndex}, ${gIndex}, ${iIndex})">✖</button>
         `;
+        
+        // Item Rename logic
+        const labelEl = row.querySelector('.item-label');
+        labelEl.addEventListener('blur', (e) => {
+          const newItem = e.target.textContent.trim();
+          if (newItem && newItem !== item) {
+            const oldKey = itemKey(s.id, g.title, item);
+            const newKey = itemKey(s.id, g.title, newItem);
+            if (state[oldKey] !== undefined) { state[newKey] = state[oldKey]; delete state[oldKey]; }
+            if (notes[oldKey] !== undefined) { notes[newKey] = notes[oldKey]; delete notes[oldKey]; }
+            
+            SECTIONS[sIndex].groups[gIndex].items[iIndex] = newItem;
+            saveState(); saveSections(); build();
+          } else {
+            e.target.textContent = item;
+          }
+        });
+        labelEl.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); e.target.blur(); } });
  
         row.addEventListener('click', e => {
-          if (e.target.classList.contains('item-notes')) return;
+          if (e.target.classList.contains('item-notes') || e.target.classList.contains('editable-text') || e.target.classList.contains('delete-btn')) return;
           toggleItem(key, row);
         });
         row.querySelector('.item-notes').addEventListener('input', e => {
@@ -810,21 +971,56 @@ function build() {
  
         cl.appendChild(row);
       });
+      
+      const addItemBtn = document.createElement('button');
+      addItemBtn.className = 'add-btn';
+      addItemBtn.textContent = '+ Add Item';
+      addItemBtn.onclick = () => addItem(sIndex, gIndex);
+      cl.appendChild(addItemBtn);
  
       section.appendChild(cl);
     });
+    
+    const addGroupBtn = document.createElement('button');
+    addGroupBtn.className = 'add-btn';
+    addGroupBtn.textContent = '+ Add Category';
+    addGroupBtn.style.marginTop = '20px';
+    addGroupBtn.onclick = () => addGroup(sIndex);
+    section.appendChild(addGroupBtn);
  
     wrap.appendChild(section);
   });
+  
+  // Add Section Button in Tabs
+  const addSecTab = document.createElement('div');
+  addSecTab.className = 'tab';
+  addSecTab.style.display = 'none'; // Hidden by default
+  addSecTab.classList.add('add-sec-tab');
+  addSecTab.innerHTML = `<span style="font-size: 16px; font-weight: 800; line-height: 1;">+</span>`;
+  addSecTab.onclick = addSection;
+  tabsNav.appendChild(addSecTab);
+  
+  // If edit mode is on, ensure the + tab is visible
+  if (isEditMode) {
+      document.querySelectorAll('.add-sec-tab').forEach(el => el.style.display = 'flex');
+  } else {
+      document.querySelectorAll('.add-sec-tab').forEach(el => el.style.display = 'none');
+  }
  
   updateProgress();
-  // Ensure we don't re-attach global event listeners endlessly when rebuilding
   if (!document.getElementById('search-input').dataset.initialized) {
      initSearch();
      document.getElementById('search-input').dataset.initialized = 'true';
   }
 }
  
+// Tie the style toggle for the add section tab to the main edit toggle
+const originalToggleEditMode = toggleEditMode;
+toggleEditMode = function() {
+    originalToggleEditMode();
+    document.querySelectorAll('.add-sec-tab').forEach(el => el.style.display = isEditMode ? 'flex' : 'none');
+}
+
 build();
 </script>
 </body>
